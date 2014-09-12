@@ -340,11 +340,14 @@ void JSONVertexArray::write(std::ostream& str, WriteVisitor& visitor)
 {
     bool _useExternalBinaryArray = visitor._useExternalBinaryArray;
     bool _mergeAllBinaryFiles = visitor._mergeAllBinaryFiles;
+    bool _binForGzip = visitor._binForGzip;
     std::string basename = visitor._baseName;
 
     addUniqueID();
 
     std::stringstream url;
+    std::stringstream urlGzip;
+    
     if (visitor._useExternalBinaryArray) {
         std::string bufferName = getBufferName();
         if(bufferName.empty())
@@ -354,6 +357,13 @@ void JSONVertexArray::write(std::ostream& str, WriteVisitor& visitor)
             url << bufferName;
         else
             url << basename << "_" << _uniqueID << ".bin";
+
+		if (_binForGzip) {
+			if (visitor._mergeAllBinaryFiles)
+				urlGzip << visitor.getBinaryGzipFilename();
+			else
+				urlGzip << basename << "_" << _uniqueID << ".gz.bin";
+		}
     }
 
     std::string type;
@@ -428,7 +438,11 @@ void JSONVertexArray::write(std::ostream& str, WriteVisitor& visitor)
     str << JSONObjectBase::indent() << "\"" << type << "\"" << ": { " << std::endl;
     JSONObjectBase::level++;
     if (_useExternalBinaryArray) {
-        str << JSONObjectBase::indent() << "\"File\": \"" << osgDB::getSimpleFileName(url.str()) << "\","<< std::endl;
+		if (_binForGzip) {
+			str << JSONObjectBase::indent() << "\"File\": \"" << urlGzip.str() << "\","<< std::endl;
+		} else {
+            str << JSONObjectBase::indent() << "\"File\": \"" << osgDB::getSimpleFileName(url.str()) << "\","<< std::endl;
+		}
     } else {
         if (array->getNumElements() == 0) {
             str << JSONObjectBase::indent() << "\"Elements\": [ ],";

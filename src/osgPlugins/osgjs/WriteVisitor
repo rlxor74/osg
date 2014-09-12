@@ -52,6 +52,7 @@ public:
     bool _useExternalBinaryArray;
     bool _mergeAllBinaryFiles;
     bool _inlineImages;
+    bool _binForGzip;
     bool _varint;
     int _maxTextureDimension;
     std::vector<std::string> _specificBuffers;
@@ -85,6 +86,10 @@ public:
             suffix = "_" + buffer;
         }
         return std::string(_baseName) + suffix + ".bin";
+    }
+
+    std::string getBinaryGzipFilename() {
+        return std::string(_baseName) + ".gz.bin";
     }
 
     void closeBuffers() {
@@ -440,6 +445,7 @@ public:
     void useExternalBinaryArray(bool use) { _useExternalBinaryArray = use; }
     void mergeAllBinaryFiles(bool use) { _mergeAllBinaryFiles = use; }
     void inlineImages(bool use) { _inlineImages = use; }
+    void binForGzip(bool use) { _binForGzip = use;}
     void setVarint(bool use) { _varint = use; }
     void setMaxTextureDimension(int use) { _maxTextureDimension = use; }
     void addSpecificBuffer(const std::string& bufferFlag) { _specificBuffers.push_back(bufferFlag); }

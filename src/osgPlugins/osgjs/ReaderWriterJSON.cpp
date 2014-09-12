@@ -45,6 +45,8 @@ public:
          bool mergeAllBinaryFiles;
          bool disableCompactBuffer;
          bool inlineImages;
+         bool binForGzip;
+
          bool varint;
          std::vector<std::string> useSpecificBuffer;
 
@@ -54,6 +56,7 @@ public:
              mergeAllBinaryFiles = false;
              disableCompactBuffer = false;
              inlineImages = false;
+             binForGzip = false;
              varint = false;
          }
     };
@@ -66,6 +69,7 @@ public:
         supportsOption("useExternalBinaryArray","create binary files for vertex arrays");
         supportsOption("mergeAllBinaryFiles","merge all binary files into one to avoid multi request on a server");
         supportsOption("inlineImages","insert base64 encoded images instead of referring to them");
+        supportsOption("binForGzip","insert .gz before .bin(--> basename.gz.bin)");
         supportsOption("varint","Use varint encoding to serialize integer buffers");
         supportsOption("useSpecificBuffer=uservalue1,uservalue2","uses specific buffers for unshared buffers attached to geometries having a specified user value");
         supportsOption("disableCompactBuffer","keep source types and do not try to optimize buffers size");
@@ -132,6 +136,7 @@ public:
                 specificBuffer != options.useSpecificBuffer.end() ; ++ specificBuffer) {
                 writer.addSpecificBuffer(*specificBuffer);
             }
+            writer.binForGzip(options.binForGzip);
             model->accept(writer);
             if (writer._root.valid()) {
                 writer.write(fout);
@@ -186,6 +191,10 @@ public:
                 if (pre_equals == "inlineImages")
                 {
                     localOptions.inlineImages = true;
+                }
+                if (pre_equals == "binForGzip")
+                {
+                    localOptions.binForGzip = true;
                 }
                 if (pre_equals == "varint")
                 {
